@@ -1,3 +1,5 @@
+// Author:
+
 // Global UI Variables
 let canvasDiv;
 let canvas;
@@ -10,7 +12,7 @@ let downButton;
 let leftButton;
 let rightButton;
 
-// Global ML variables
+// Global ML Variables
 let featureExtractor;
 let imgFeatures;
 let knnClassifier;
@@ -20,9 +22,9 @@ let ups;
 let downs;
 let lefts;
 let rights;
+let centers;
 
 function setup() {
-  // build canvas and text ui 
   canvasDiv = createDiv();
   canvas = createCanvas(640, 480);
   canvas.parent(canvasDiv);
@@ -31,27 +33,20 @@ function setup() {
   textP.parent(textDiv);
   textP2 = createP("[Training data here.]");
   textP2.parent(textDiv);
-  // build buttons 
   buildButtons();
-  // initialize ups, downs, lefts, rights 
   ups = 0;
   downs = 0;
   lefts = 0;
   rights = 0;
-  // load video 
   video = createCapture(VIDEO, videoReady);
 }
 
 function draw() {
   if(isModelReady) {
-    // reverse the video
     translate(width, 0);
     scale(-1, 1);
-    // draw the video to the canvas
     image(video, 0, 0);
-    // get the features of the current image on canvas 
     imgFeatures = featureExtractor.infer(canvas);
-    // if there is at least one example in dataset, start classifying
     if(knnClassifier.getNumLabels() > 0) {
       knnClassifier.classify(imgFeatures, gotResults);
     }
@@ -60,40 +55,52 @@ function draw() {
 
 function buildButtons() {
   buttonDiv = createDiv();
-  // configure up button 
+  buttonDiv = createDiv();
   upButton = createButton("Up");
   upButton.parent(buttonDiv);
-  upButton.mousePressed(function() {
+  upButton.mousePressed(function () {
     ups++;
-    textP2.html("Ups: " + ups + " - Downs:" + downs + " - Lefts: " + lefts + " - Rights: " + rights);
+    textP2.html("Ups: " + ups + " - Downs: " + downs + " - Lefts: " + lefts +
+    " - Rights: " + rights + " - Centers: " + centers);
     knnClassifier.addExample(imgFeatures, "Up");
   });
-  // configure down button 
   downButton = createButton("Down");
   downButton.parent(buttonDiv);
-  downButton.mousePressed(function() {
+  downButton.mousePressed(function () {
     downs++;
-    textP2.html("Ups: " + ups + " - Downs:" + downs + " - Lefts: " + lefts + " - Rights: " + rights);
+    textP2.html("Ups: " + ups + " - Downs: " + downs + " - Lefts: " + lefts +
+    " - Rights: " + rights + " - Centers: " + centers);
     knnClassifier.addExample(imgFeatures, "Down");
   });
-  // configure left button 
   leftButton = createButton("Left");
   leftButton.parent(buttonDiv);
-  leftButton.mousePressed(function() {
+  leftButton.mousePressed(function () {
     lefts++;
-    textP2.html("Ups: " + ups + " - Downs:" + downs + " - Lefts: " + lefts + " - Rights: " + rights);
+    textP2.html("Ups: " + ups + " - Downs: " + downs + " - Lefts: " + lefts +
+    " - Rights: " + rights + " - Centers: " + centers);
     knnClassifier.addExample(imgFeatures, "Left");
   });
-  // configure right button 
   rightButton = createButton("Right");
   rightButton.parent(buttonDiv);
-  rightButton.mousePressed(function() {
+  rightButton.mousePressed(function () {
     rights++;
-    textP2.html("Ups: " + ups + " - Downs:" + downs + " - Lefts: " + lefts + " - Rights: " + rights);
+    textP2.html("Ups: " + ups + " - Downs: " + downs + " - Lefts: " + lefts +
+    " - Rights: " + rights + " - Centers: " + centers);
     knnClassifier.addExample(imgFeatures, "Right");
   });
-  // hide button div 
+  centerButton = createButton("Center");
+  centerButton.parent(buttonDiv);
+  centerButton.mousePressed(function () {
+    centers++;
+    textP2.html("Ups: " + ups + " - Downs: " + downs + " - Lefts: " + lefts +
+    " - Rights: " + rights + " - Centers: " + centers);
+    knnClassifier.addExample(imgFeatures, "Center");
+  });
+  // new code below
+
   buttonDiv.style("display", "none");
+  // new code below
+
 }
 
 function videoReady() {
@@ -106,6 +113,7 @@ function featureExtractorLoaded() {
   knnClassifier = ml5.KNNClassifier();
   textP.html("Begin posing and adding data!");
   buttonDiv.style("display", "block");
+  buttonDiv2.style("display", "block");
 }
 
 function gotResults(error, results) {
